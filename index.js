@@ -53,7 +53,7 @@ async function run(){
     const productsCollection=client.db("ComfortZone").collection("Products");
     const addCollection=client.db("ComfortZone").collection("Advertise");
     
-   
+   //add 
     app.get('/categories',async(req,res)=>{
       const query={};
       const categories=await categoriesCollection.find(query).toArray();
