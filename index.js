@@ -61,6 +61,7 @@ async function run(){
       const categories=await categoriesCollection.find(query).toArray();
       res.send(categories);
     })
+    //add
 
     app.get('/add',async(req,res)=>{
       const query={};
