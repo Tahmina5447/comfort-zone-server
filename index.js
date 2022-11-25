@@ -52,6 +52,8 @@ async function run(){
     const categoriesCollection = client.db("ComfortZone").collection("Categories");
     const productsCollection=client.db("ComfortZone").collection("Products");
     const addCollection=client.db("ComfortZone").collection("Advertise");
+    const bookingsCollection=client.db("ComfortZone").collection("Bookings");
+    const usersCollection=client.db("ComfortZone").collection("Users");
     
    //add product cullections
     app.get('/categories',async(req,res)=>{
@@ -73,40 +75,88 @@ async function run(){
       res.send(result);
     })
 
+    app.post('/bookings',async(req,res)=>{
+      const product=req.body;
+      const result=await bookingsCollection.insertOne(product);
+      res.send(result);
+    })
+
+
+
+app.get('/categories/:id',async(req,res)=>{
+  const id=req.params.id;
+  const query={_id:ObjectId(id)}
+  const result=await categoriesCollection.findOne(query);
+  res.send(result);
+})
 
 
     app.get('/products',async(req,res)=>{
         
-        let query={};
-        if(req.query.categories){
-          query={
-            categories:req.query.categories
-          }
-        }
+       const categorie=req.query.categories;
+       const query={
+        categories:categorie
+       }
         const cursor=productsCollection.find(query);
         const reviews=await cursor.toArray();
         res.send(reviews);
         console.log(reviews)
       })
 
-    // // Load all items
-    // app.get('/allItems',async(req,res)=>{
-    //   const query={};
-    //   const cursor=itemsCollection.find(query);
-    //   const allItems=await cursor.toArray();
-    //       // console.log(allItems)
-    //   res.send(allItems);
-    // })
 
-    // // for jwt token
-    // app.post('/jwt',(req,res)=>{
-    //   const user=req.body;
-    //         // console.log(user)
-    //   const token=jwt.sign(user,process.env.TOKEN);
-    //   res.send({token});
-    // })
+     // get review by user
+     app.get('/orders',async(req,res)=>{
+      
+      let query={};
+      if(req.query.email){
+        query={
+          email:req.query.email
+        }
+      }
+      const cursor=bookingsCollection.find(query);
+      const orders=await cursor.toArray();
+      res.send(orders);
+    })
 
 
+     app.get('/myProducts',async(req,res)=>{
+      
+      let query={};
+      if(req.query.email){
+        query={
+          email:req.query.email
+        }
+      }
+      const cursor=productsCollection.find(query);
+      const orders=await cursor.toArray();
+      res.send(orders);
+    })
+    
+
+
+    app.post('/users', async (req, res) => {
+      const user = req.body;
+      console.log(user);
+      const result = await usersCollection.insertOne(user);
+      res.send(result);
+  });
+
+
+
+  app.put('/users/admin/:id', async (req, res) => {
+    
+  
+    const id = req.params.id;
+    const filter = { _id: ObjectId(id) }
+    const options = { upsert: true };
+    const updatedDoc = {
+        $set: {
+            role: 'admin'
+        }
+    }
+    const result = await usersCollection.updateOne(filter, updatedDoc, options);
+    res.send(result);
+  })
     // // add item by customer
     // app.post('/allItems',async(req,res)=>{
     //   const review=req.body;
