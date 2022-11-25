@@ -98,13 +98,21 @@ app.get('/categories/:id',async(req,res)=>{
         categories:categorie
        }
         const cursor=productsCollection.find(query);
-        const reviews=await cursor.toArray();
-        res.send(reviews);
-        console.log(reviews)
+        const products=await cursor.toArray();
+        res.send(products);
+       
       })
 
+     app.get('/allUsers',async(req,res)=>{
+      const query={};
+      const categories=await usersCollection.find(query).toArray();
+      
+      // res.send(categories);
+     })
+        
 
-     // get review by user
+
+     
      app.get('/orders',async(req,res)=>{
       
       let query={};
@@ -136,109 +144,28 @@ app.get('/categories/:id',async(req,res)=>{
 
     app.post('/users', async (req, res) => {
       const user = req.body;
-      console.log(user);
       const result = await usersCollection.insertOne(user);
       res.send(result);
   });
 
 
-
-  app.put('/users/admin/:id', async (req, res) => {
-    
-  
-    const id = req.params.id;
-    const filter = { _id: ObjectId(id) }
-    const options = { upsert: true };
-    const updatedDoc = {
-        $set: {
-            role: 'admin'
-        }
-    }
-    const result = await usersCollection.updateOne(filter, updatedDoc, options);
-    res.send(result);
+  app.get('/users/seller/:email', async (req, res) => {
+    const email = req.params.email;
+    const query = { email }
+    const user = await usersCollection.findOne(query);
+    // console.log(user)
+    res.send({ isSeller: user?.candidate === 'Seller' });
   })
-    // // add item by customer
-    // app.post('/allItems',async(req,res)=>{
-    //   const review=req.body;
-    //   const result=await itemsCollection.insertOne(review);
-    //   res.send(result);
-    // })
 
-    // // get item details by id
-    // app.get('/itemDetails/:id',async(req,res)=>{
-    //   const id=req.params.id;
-    //   const query={_id:ObjectId(id)}
-    //   const itemDetails=await itemsCollection.findOne(query);
-    //   res.send(itemDetails);
-    // })
+  app.get('/users/admin/:email', async (req, res) => {
+    const email = req.params.email;
+    const query = { email }
+    const user = await usersCollection.findOne(query);
+    res.send({ isAdmin: user?.candidate === 'Admin' });
+  })
 
-    // // add review on database
-    // app.post('/review',async(req,res)=>{
-    //   const review=req.body;
-    //   const result=await reviewCollection.insertOne(review);
-    //   console.log(result)
-    //   res.send(result);
-    // })
-
-    // // get review by id
-    // app.get('/review',async(req,res)=>{
-      
-    //   let  query={};
-    //   // console.log(req.query.email)
-    //   if(req.query.item){
-    //     query={
-    //       item:req.query.item
-    //     }
-    //   }
-      
-    //   const cursor=reviewCollection.find(query);
-    //   const review=await cursor.sort({_id:-1}).toArray();
-    //   console.log(review)
-    //   res.send(review);
-    // })
-
-    // // get review by user
-    // app.get('/userReview',verifyJWT,async(req,res)=>{
-    //   const decoded=req.decoded;
-    //   if(decoded.email !== req.query.email){
-    //     return res.status(403).send({message:'unauthorized access'})
-    //   }
-    //   let query={};
-    //   if(req.query.email){
-    //     query={
-    //       email:req.query.email
-    //     }
-    //   }
-    //   const cursor=reviewCollection.find(query);
-    //   const reviews=await cursor.toArray();
-    //   res.send(reviews);
-    // })
-
-
-    // delete review
-    // app.delete('/userReview/:id',async(req,res)=>{
-    //   const id= req.params.id;
-    //   const query={_id:ObjectId(id)}
-    //   const result=await reviewCollection.deleteOne(query);
-    //   console.log(result)
-    //   res.send(result);
-    // })
-
-
-    // update review
-    // app.put('/userReview/:id',async(req,res)=>{
-    //   const id=req.params.id;
-    //   const status=req.body.status;
-    //   const query={_id:ObjectId(id)}
-    //   const updatedReview={
-    //     $set:{
-    //       message:status
-    //     }
-    //   }
-      
-    //   const result = await reviewCollection.updateOne(query,updatedReview);
-    //   res.send(result);
-    // })
+  
+    
 
   }finally{
 
