@@ -3,7 +3,6 @@ const app = express();
 const cors = require('cors');
 const port =process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-// const jwt=require('jsonwebtoken')
 require('dotenv').config();
 
 app.use(cors());
@@ -18,25 +17,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 
 
-// function verifyJWT(req,res,next){
-//   const authHeader=req.headers.authorization;
-//   // console.log(authHeader)
-//   if(!authHeader){
-//     return res.status(401).send({message:'unauthorized access'})
-//   }
-//   const token=authHeader.split(' ')[1];
-//   // console.log(token)
-//   jwt.verify(token,process.env.TOKEN,function(err,decoded){
-//     if(err){
-//       return res.status(401).send({message:'unauthorized access'})
-//     }
-//     // console.log(decoded)
-//     req.decoded=decoded;
-//     next();
-//   })
 
-
-// }
 
 
 
@@ -55,13 +36,13 @@ async function run(){
     const bookingsCollection=client.db("ComfortZone").collection("Bookings");
     const usersCollection=client.db("ComfortZone").collection("Users");
     
-   //add product cullections
+   
     app.get('/categories',async(req,res)=>{
       const query={};
       const categories=await categoriesCollection.find(query).toArray();
       res.send(categories);
     })
-    //add user 
+     
 
     app.get('/add',async(req,res)=>{
       const query={};
@@ -104,12 +85,7 @@ app.get('/categories/:id',async(req,res)=>{
        
       })
 
-     app.get('/allUsers',async(req,res)=>{
-      const query={};
-      const categories=await usersCollection.find(query).toArray();
-      
-      // res.send(categories);
-     })
+     
         
 
 
@@ -165,7 +141,38 @@ app.get('/categories/:id',async(req,res)=>{
     res.send({ isAdmin: user?.candidate === 'Admin' });
   })
 
+   
+  app.get('/users',async(req,res)=>{
+    
+        
+      const candidate=req.query.candidate;
+      const query={
+        candidate:candidate
+      }
+       const cursor=usersCollection.find(query);
+       const user=await cursor.toArray();
+       res.send(user);
   
+
+  })
+
+  app.delete('/product/:id',async(req,res)=>{
+    const id= req.params.id;
+    const query={_id:ObjectId(id)}
+    const result=await productsCollection.deleteOne(query);
+    // console.log(result)
+    res.send(result);
+  })
+
+  app.delete('/user/:id',async(req,res)=>{
+    const id= req.params.id;
+    const query={_id:ObjectId(id)}
+    const result=await usersCollection.deleteOne(query);
+    // console.log(result)
+    res.send(result);
+  })
+
+
     
 
   }finally{
