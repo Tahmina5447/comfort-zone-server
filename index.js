@@ -35,6 +35,8 @@ async function run(){
     const addCollection=client.db("ComfortZone").collection("Advertise");
     const bookingsCollection=client.db("ComfortZone").collection("Bookings");
     const usersCollection=client.db("ComfortZone").collection("Users");
+    const allProductCollection=client.db("ComfortZone").collection("allProducts");
+    const productCategoriesCollection=client.db("ComfortZone").collection("productCategories");
     
    
     app.get('/categories',async(req,res)=>{
@@ -42,7 +44,38 @@ async function run(){
       const categories=await categoriesCollection.find(query).toArray();
       res.send(categories);
     })
+    app.get('/productCategories',async(req,res)=>{
+      const query={};
+      const categories=await productCategoriesCollection.find(query).toArray();
+      res.send(categories);
+    })
+    app.get('/allProduct',async(req,res)=>{
+      const query={};
+      const result=await allProductCollection.find(query).toArray();
+      res.send(result);
+    })
      
+    app.get('/allProduct/:id',async(req,res)=>{
+      const id=req.params.id;
+      const query={_id:ObjectId(id)}
+      const result=await allProductCollection.findOne(query);
+      res.send(result);
+    })
+
+
+    app.get('/allProducts',async(req,res)=>{
+        
+      const category=req.query.category;
+      const query={
+        "product.category":category
+      }
+      
+       const cursor=allProductCollection.find(query);
+       const products=await cursor.toArray();
+       res.send(products);
+      
+     })
+
 
     app.get('/add',async(req,res)=>{
       const query={};
